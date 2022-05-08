@@ -1,0 +1,153 @@
+package by.babanin.vm.lc3;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import by.babanin.vm.ConditionFlag;
+import by.babanin.vm.VirtualMachine;
+import by.babanin.vm.memory.VirtualMachineMemory;
+
+/**
+ * Memory has 16384 cells. Each cell is 8 bytes or 64 bits.
+ * Memory size is 131072 bytes or 128 KB.
+ */
+public class LC3VirtualMachine implements VirtualMachine {
+
+    private static final byte MEMORY_CELLS_DEGREE = 14;
+    private static final byte MEMORY_CELLS_BASIS = 2;
+    private static final byte INSTRUCTION_SIZE = 16;
+    private static final short PC_START = 0x3000;
+    private final Map<LC3Register, Short> registers = new HashMap<>(LC3Register.values().length);
+    private final VirtualMachineMemory memory;
+
+    public LC3VirtualMachine() {
+        int cellsAmount = (int) Math.pow(MEMORY_CELLS_BASIS, MEMORY_CELLS_DEGREE);
+        this.memory = new VirtualMachineMemory(cellsAmount, INSTRUCTION_SIZE);
+
+    }
+
+    @Override
+    public void run() {
+        setRegisterValue(LC3Register.R_PC, PC_START);
+
+        boolean running = true;
+        while(running) {
+            short instruction = (short) memory.readInstruction(getRegisterValue(LC3Register.R_PC));
+            LC3OperationCode operationCode = LC3OperationCode.valueOf(instruction, INSTRUCTION_SIZE);
+            operationCode.execute(this, instruction);
+        }
+    }
+
+    public void setRegisterValue(LC3Register register, short value) {
+        registers.put(register, value);
+    }
+
+    public short getRegisterValue(LC3Register register) {
+        Short value = registers.get(register);
+        if(value == null) {
+            value = 0;
+            setRegisterValue(register, value);
+        }
+        return value;
+    }
+
+    private void setConditionFlag(ConditionFlag flag) {
+        setRegisterValue(LC3Register.R_COND, flag.getFlagCode());
+    }
+
+    private void updateFlag(LC3Register register) {
+        short value = getRegisterValue(register);
+        setConditionFlag(LC3ConditionFlag.valueOf(value, INSTRUCTION_SIZE));
+    }
+
+    public ConditionFlag getConditionFlag() {
+        short value = getRegisterValue(LC3Register.R_COND);
+        return LC3ConditionFlag.valueOfFlag(value);
+    }
+
+    public void br(short instruction) {
+        // TODO need to implement
+    }
+
+    public void add(short instruction) {
+        /* destination register (DR) */
+        LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
+        /* first operand (SR1) */
+        LC3Register r1 = LC3Register.valueOf((byte) ((instruction >>> 6) & 0x7));
+        /* whether we are in immediate mode */
+        short imm_flag = (short) ((instruction >>> 5) & 0x1);
+        if(imm_flag == 1) {
+            short imm5 = signExtend((short) (instruction & 0x1F), (byte) 5);
+            setRegisterValue(r0, (short) (getRegisterValue(r1) + imm5));
+        }
+        else {
+            LC3Register r2 = LC3Register.valueOf((byte) (instruction & 0x7));
+            setRegisterValue(r0, (short) (getRegisterValue(r1) + getRegisterValue(r2)));
+        }
+
+        updateFlag(r0);
+    }
+
+    public short signExtend(short value, byte size) {
+        if((value >> (size - 1)) == 1) {
+            value |= (0xFFFF << size);
+        }
+        return value;
+    }
+
+    public void ld(short instruction) {
+        // TODO need to implement
+    }
+
+    public void st(short instruction) {
+        // TODO need to implement
+    }
+
+    public void jsr(short instruction) {
+        // TODO need to implement
+    }
+
+    public void and(short instruction) {
+        // TODO need to implement
+    }
+
+    public void ldr(short instruction) {
+        // TODO need to implement
+    }
+
+    public void str(short instruction) {
+        // TODO need to implement
+    }
+
+    public void rti(short instruction) {
+        // TODO need to implement
+    }
+
+    public void not(short instruction) {
+        // TODO need to implement
+    }
+
+    public void ldi(short instruction) {
+        // TODO need to implement
+    }
+
+    public void sti(short instruction) {
+        // TODO need to implement
+    }
+
+    public void jmp(short instruction) {
+        // TODO need to implement
+    }
+
+    public void res(short instruction) {
+        // TODO need to implement
+    }
+
+    public void lea(short instruction) {
+        // TODO need to implement
+    }
+
+    public void trap(short instruction) {
+        // TODO need to implement
+    }
+}
