@@ -6,6 +6,7 @@ import java.util.Map;
 import by.babanin.vm.ConditionFlag;
 import by.babanin.vm.VirtualMachine;
 import by.babanin.vm.memory.VirtualMachineMemory;
+import by.babanin.vm.util.Utils;
 
 /**
  * Memory has 16384 cells. Each cell is 8 bytes or 64 bits.
@@ -32,9 +33,18 @@ public class LC3VirtualMachine implements VirtualMachine {
 
         boolean running = true;
         while(running) {
-            short instruction = (short) memory.readInstruction(getRegisterValue(LC3Register.R_PC));
+            short instruction = (short) memory.readInstruction(getAndIncProgramCounter());
             LC3OperationCode operationCode = LC3OperationCode.valueOf(instruction, INSTRUCTION_SIZE);
             operationCode.execute(this, instruction);
+        }
+    }
+
+    @Override
+    public void writeProgram(long address, String program) {
+        for(int i = 0; i < program.length(); i += INSTRUCTION_SIZE) {
+            long instruction = Utils.parseLong(program.substring(i, i + INSTRUCTION_SIZE), 2);
+            memory.writeInstruction(address, instruction);
+            address += INSTRUCTION_SIZE;
         }
     }
 
@@ -63,6 +73,20 @@ public class LC3VirtualMachine implements VirtualMachine {
     public ConditionFlag getConditionFlag() {
         short value = getRegisterValue(LC3Register.R_COND);
         return LC3ConditionFlag.valueOfFlag(value);
+    }
+
+    public void setProgramCounter(short value) {
+        setRegisterValue(LC3Register.R_PC, value);
+    }
+
+    public short getProgramCounter() {
+        return getRegisterValue(LC3Register.R_PC);
+    }
+
+    public short getAndIncProgramCounter() {
+        short pc = getProgramCounter();
+        setProgramCounter((short) (pc + INSTRUCTION_SIZE));
+        return pc;
     }
 
     public void br(short instruction) {
