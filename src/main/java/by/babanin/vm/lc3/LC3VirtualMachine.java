@@ -61,7 +61,7 @@ public class LC3VirtualMachine implements VirtualMachine {
         return value;
     }
 
-    private void setConditionFlag(ConditionFlag flag) {
+    public void setConditionFlag(ConditionFlag flag) {
         setRegisterValue(LC3Register.R_COND, flag.getFlagCode());
     }
 
@@ -90,7 +90,18 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void br(short instruction) {
-        // TODO need to implement
+        byte n = (byte) ((instruction >>> 11) & 0x1);
+        byte z = (byte) ((instruction >>> 10) & 0x1);
+        byte p = (byte) ((instruction >>> 9) & 0x1);
+
+        ConditionFlag conditionFlag = getConditionFlag();
+        if((n == 0 && z == 0 && p == 0) ||
+                (n == 1 && conditionFlag == LC3ConditionFlag.FL_NEG) ||
+                (z == 1 && conditionFlag == LC3ConditionFlag.FL_ZRO) ||
+                (p == 1 && conditionFlag == LC3ConditionFlag.FL_POS)) {
+            short pcOffset = signExtend((short) (instruction & 0x01FF), (byte) 9);
+            setProgramCounter((short) (getProgramCounter() + pcOffset));
+        }
     }
 
     public void add(short instruction) {

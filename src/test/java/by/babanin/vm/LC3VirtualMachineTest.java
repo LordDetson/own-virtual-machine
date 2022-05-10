@@ -169,4 +169,48 @@ class LC3VirtualMachineTest {
         Assertions.assertEquals(-6, value);
         Assertions.assertEquals(LC3ConditionFlag.FL_NEG, virtualMachine.getConditionFlag());
     }
+
+    @Test
+    void testBr1() {
+        short instruction = (short) 0b0000_000_000111111;
+        virtualMachine.setConditionFlag(LC3ConditionFlag.FL_ZRO);
+
+        virtualMachine.br(instruction);
+
+        short programCounter = virtualMachine.getProgramCounter();
+        Assertions.assertEquals(0x3F, programCounter);
+    }
+
+    @Test
+    void testBrn() {
+        short instruction = (short) 0b0000_100_000111111;
+        virtualMachine.setConditionFlag(LC3ConditionFlag.FL_ZRO);
+
+        virtualMachine.br(instruction);
+
+        short programCounter = virtualMachine.getProgramCounter();
+        Assertions.assertEquals(0x00, programCounter);
+    }
+
+    @Test
+    void testBrz() {
+        short instruction = (short) 0b0000_010_000111111;
+        virtualMachine.setConditionFlag(LC3ConditionFlag.FL_ZRO);
+
+        virtualMachine.br(instruction);
+
+        short programCounter = virtualMachine.getProgramCounter();
+        Assertions.assertEquals(0x3F, programCounter);
+    }
+
+    @Test
+    void testBrnz() {
+        short instruction = (short) 0b0000_110_000111111;
+        virtualMachine.setConditionFlag(LC3ConditionFlag.FL_ZRO);
+
+        virtualMachine.br(instruction);
+
+        short programCounter = virtualMachine.getProgramCounter();
+        Assertions.assertEquals(0x3F, programCounter);
+    }
 }
