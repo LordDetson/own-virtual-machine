@@ -132,7 +132,19 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void and(short instruction) {
-        // TODO need to implement
+        LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
+        LC3Register r1 = LC3Register.valueOf((byte) ((instruction >>> 6) & 0x7));
+        byte immFlag = (byte) ((instruction >>> 5) & 0x1);
+        if(immFlag == 0) {
+            LC3Register r2 = LC3Register.valueOf((byte) (instruction & 0x7));
+            setRegisterValue(r0, (short) (getRegisterValue(r1) & getRegisterValue(r2)));
+        }
+        else {
+            short imm5 = signExtend((short) (instruction & 0x1F), (byte) 5);
+            setRegisterValue(r0, (short) (getRegisterValue(r1) & imm5));
+        }
+
+        updateFlag(r0);
     }
 
     public void ldr(short instruction) {

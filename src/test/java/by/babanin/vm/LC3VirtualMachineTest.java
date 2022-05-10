@@ -132,4 +132,29 @@ class LC3VirtualMachineTest {
         short value = virtualMachine.getRegisterValue(LC3Register.R1);
         Assertions.assertEquals(0x7F, value);
     }
+
+    @Test
+    void testAndRegisterMode() {
+        short instruction = (short) 0b0101_000_000_0_00_001;
+        virtualMachine.setRegisterValue(LC3Register.R0, (short) 5);
+        virtualMachine.setRegisterValue(LC3Register.R1, (short) -5);
+
+        virtualMachine.and(instruction);
+
+        short value = virtualMachine.getRegisterValue(LC3Register.R0);
+        Assertions.assertEquals(1, value);
+        Assertions.assertEquals(LC3ConditionFlag.FL_POS, virtualMachine.getConditionFlag());
+    }
+
+    @Test
+    void testAndImmediateMode() {
+        short instruction = (short) 0b0101_000_000_1_11011; // -5
+        virtualMachine.setRegisterValue(LC3Register.R0, (short) 5);
+
+        virtualMachine.and(instruction);
+
+        short value = virtualMachine.getRegisterValue(LC3Register.R0);
+        Assertions.assertEquals(1, value);
+        Assertions.assertEquals(LC3ConditionFlag.FL_POS, virtualMachine.getConditionFlag());
+    }
 }
