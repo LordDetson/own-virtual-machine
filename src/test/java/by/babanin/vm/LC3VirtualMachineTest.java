@@ -92,4 +92,44 @@ class LC3VirtualMachineTest {
         Assertions.assertEquals(-9, registerValue);
         Assertions.assertEquals(LC3ConditionFlag.FL_NEG, conditionFlag);
     }
+
+    @Test
+    void testLdi1() {
+        long address = 0x3000;
+        short instruction = (short) 0b1010_001_000010000;
+        String program =
+                "1010001000010000" +
+                "0000000000000000" + // PC position
+                "0011000001000000" +
+                "0000000000000000" +
+                "0000000001111111";
+        virtualMachine.writeProgram(address, program);
+        virtualMachine.setProgramCounter((short) address);
+        virtualMachine.getAndIncProgramCounter();
+
+        virtualMachine.ldi(instruction);
+
+        short value = virtualMachine.getRegisterValue(LC3Register.R1);
+        Assertions.assertEquals(0x7F, value);
+    }
+
+    @Test
+    void testLdi2() {
+        long address = 0x3000;
+        short instruction = (short) 0b1010_001_000010000;
+        String program =
+                "0000000001111111" +
+                "1010001000010000" +
+                "0000000000000000" + // PC position
+                "0011000000000000";
+        virtualMachine.writeProgram(address, program);
+        virtualMachine.setProgramCounter((short) address);
+        virtualMachine.getAndIncProgramCounter();
+        virtualMachine.getAndIncProgramCounter();
+
+        virtualMachine.ldi(instruction);
+
+        short value = virtualMachine.getRegisterValue(LC3Register.R1);
+        Assertions.assertEquals(0x7F, value);
+    }
 }
