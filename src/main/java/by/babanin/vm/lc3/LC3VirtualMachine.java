@@ -160,7 +160,10 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void not(short instruction) {
-        // TODO need to implement
+        LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
+        LC3Register r1 = LC3Register.valueOf((byte) ((instruction >>> 6) & 0x7));
+        setRegisterValue(r0, (short) ~getRegisterValue(r1));
+        updateFlag(r0);
     }
 
     public void ldi(short instruction) {

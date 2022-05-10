@@ -157,4 +157,16 @@ class LC3VirtualMachineTest {
         Assertions.assertEquals(1, value);
         Assertions.assertEquals(LC3ConditionFlag.FL_POS, virtualMachine.getConditionFlag());
     }
+
+    @Test
+    void testNot() {
+        short instruction = (short) 0b0101_000_000_1_11111;
+        virtualMachine.setRegisterValue(LC3Register.R0, (short) 5);
+
+        virtualMachine.not(instruction);
+
+        short value = virtualMachine.getRegisterValue(LC3Register.R0);
+        Assertions.assertEquals(-6, value);
+        Assertions.assertEquals(LC3ConditionFlag.FL_NEG, virtualMachine.getConditionFlag());
+    }
 }
