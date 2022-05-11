@@ -139,7 +139,16 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void jsr(short instruction) {
-        // TODO need to implement
+        setRegisterValue(LC3Register.R7, getProgramCounter());
+        byte immFlag = (byte) ((instruction >>> 11) & 0x1);
+        if(immFlag == 0) {
+            LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 6) & 0x7));
+            setProgramCounter(getRegisterValue(r0));
+        }
+        else {
+            short pcOffset = signExtend((short) (instruction & 0x7FF), (byte) 11);
+            setProgramCounter((short) (getProgramCounter() + pcOffset));
+        }
     }
 
     public void and(short instruction) {
