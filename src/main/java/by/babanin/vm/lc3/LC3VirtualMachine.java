@@ -172,7 +172,13 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void ldr(short instruction) {
-        // TODO need to implement
+        LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
+        LC3Register r1 = LC3Register.valueOf((byte) ((instruction >>> 6) & 0x7));
+        short pcOffset = signExtend((short) (instruction & 0x3F), (byte) 6);
+        int address = getRegisterValue(r1) + pcOffset;
+        short value = (short) memory.readInstruction(address);
+        setRegisterValue(r0, value);
+        updateFlag(r0);
     }
 
     public void str(short instruction) {
