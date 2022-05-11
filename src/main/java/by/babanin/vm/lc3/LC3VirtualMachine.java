@@ -189,7 +189,8 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void jmp(short instruction) {
-        // TODO need to implement
+        LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 6) & 0x7));
+        setProgramCounter(getRegisterValue(r0));
     }
 
     public void res(short instruction) {

@@ -213,4 +213,22 @@ class LC3VirtualMachineTest {
         short programCounter = virtualMachine.getProgramCounter();
         Assertions.assertEquals(0x3F, programCounter);
     }
+
+    @Test
+    void testJmp() {
+        short instruction = (short) 0b1100_000_011_000000;
+        virtualMachine.setRegisterValue(LC3Register.R3, (short) 0x3000);
+        virtualMachine.jmp(instruction);
+        short programCounter = virtualMachine.getProgramCounter();
+        Assertions.assertEquals(0x3000, programCounter);
+    }
+
+    @Test
+    void testRet() {
+        short instruction = (short) 0b1100_000_111_000000;
+        virtualMachine.setRegisterValue(LC3Register.R7, (short) 0x3000);
+        virtualMachine.jmp(instruction);
+        short programCounter = virtualMachine.getProgramCounter();
+        Assertions.assertEquals(0x3000, programCounter);
+    }
 }
