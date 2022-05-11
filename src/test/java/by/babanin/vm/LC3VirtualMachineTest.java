@@ -302,4 +302,18 @@ class LC3VirtualMachineTest {
         short registerValue = virtualMachine.getRegisterValue(LC3Register.R1);
         Assertions.assertEquals(26, registerValue);
     }
+
+    @Test
+    void testSti() {
+        short instruction = (short) 0b1011_000_000110000;
+        virtualMachine.setRegisterValue(LC3Register.R0, (short) 26);
+        virtualMachine.setProgramCounter((short) 0x3000);
+        virtualMachine.writeProgram(0x3030, "0010000000000000"); // 0x2000
+        virtualMachine.sti(instruction);
+
+        short instructionToReadValue = (short) 0b1010_001_000110000;
+        virtualMachine.ldi(instructionToReadValue);
+        short registerValue = virtualMachine.getRegisterValue(LC3Register.R1);
+        Assertions.assertEquals(26, registerValue);
+    }
 }
