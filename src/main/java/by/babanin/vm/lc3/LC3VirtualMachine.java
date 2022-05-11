@@ -131,7 +131,11 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void ld(short instruction) {
-        // TODO need to implement
+        LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
+        short pcOffset = signExtend((short) (instruction & 0x1FF), (byte) 9);
+        short value = (short) memory.readInstruction(getProgramCounter() + pcOffset);
+        setRegisterValue(r0, value);
+        updateFlag(r0);
     }
 
     public void st(short instruction) {
