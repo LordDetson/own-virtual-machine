@@ -278,4 +278,15 @@ class LC3VirtualMachineTest {
         Assertions.assertEquals(26, registerValue);
         Assertions.assertEquals(LC3ConditionFlag.FL_POS, conditionFlag);
     }
+
+    @Test
+    void testLea() {
+        short instruction = (short) 0b1110_000_000110000;
+        virtualMachine.setProgramCounter((short) 0x3000);
+        virtualMachine.lea(instruction);
+        short registerValue = virtualMachine.getRegisterValue(LC3Register.R0);
+        ConditionFlag conditionFlag = virtualMachine.getConditionFlag();
+        Assertions.assertEquals(0x3030, registerValue);
+        Assertions.assertEquals(LC3ConditionFlag.FL_POS, conditionFlag);
+    }
 }

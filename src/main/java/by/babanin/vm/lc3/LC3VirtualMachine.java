@@ -217,7 +217,10 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void lea(short instruction) {
-        // TODO need to implement
+        LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
+        short pcOffset = signExtend((short) (instruction & 0x01FF), (byte) 9);
+        setRegisterValue(r0, (short) (getProgramCounter() + pcOffset));
+        updateFlag(r0);
     }
 
     public void trap(short instruction) {
