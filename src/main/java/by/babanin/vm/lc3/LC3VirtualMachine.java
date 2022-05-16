@@ -231,6 +231,31 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void trap(short instruction) {
-        // TODO need to implement
+        LC3TrapCode trapCode = LC3TrapCode.valueOf((byte) (instruction & 0xFF));
+        trapCode.execute(this);
+    }
+
+    public void getc() {
+
+    }
+
+    public void out() {
+
+    }
+
+    public void puts() {
+
+    }
+
+    public void in() {
+
+    }
+
+    public void putsp() {
+
+    }
+
+    public void halt() {
+
     }
 }
