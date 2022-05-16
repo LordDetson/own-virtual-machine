@@ -261,7 +261,10 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void in() {
-
+        System.out.print(">> ");
+        Scanner scanner = new Scanner(System.in);
+        String str = scanner.nextLine();
+        setRegisterValue(LC3Register.R0, (short) str.charAt(0));
     }
 
     public void putsp() {
