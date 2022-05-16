@@ -244,7 +244,16 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void puts() {
-
+        short charAddress = getRegisterValue(LC3Register.R0);
+        char character;
+        StringBuilder builder = new StringBuilder();
+        do {
+            character = (char) memory.readInstruction(charAddress);
+            builder.append(character);
+            charAddress += 16;
+        }
+        while(character != 0);
+        System.out.println(builder);
     }
 
     public void in() {
