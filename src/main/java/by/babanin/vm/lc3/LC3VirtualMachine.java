@@ -2,6 +2,7 @@ package by.babanin.vm.lc3;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import by.babanin.vm.ConditionFlag;
 import by.babanin.vm.VirtualMachine;
@@ -236,7 +237,9 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void getc() {
-
+        Scanner scanner = new Scanner(System.in);
+        String str = scanner.nextLine();
+        setRegisterValue(LC3Register.R0, (short) str.charAt(0));
     }
 
     public void out() {
