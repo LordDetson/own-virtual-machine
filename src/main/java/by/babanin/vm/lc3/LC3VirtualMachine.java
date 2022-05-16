@@ -22,6 +22,8 @@ public class LC3VirtualMachine implements VirtualMachine {
     private final Map<LC3Register, Short> registers = new HashMap<>(LC3Register.values().length);
     private final VirtualMachineMemory memory;
 
+    private boolean running;
+
     public LC3VirtualMachine() {
         int cellsAmount = (int) Math.pow(MEMORY_CELLS_BASIS, MEMORY_CELLS_DEGREE);
         this.memory = new VirtualMachineMemory(cellsAmount, INSTRUCTION_SIZE);
@@ -32,7 +34,7 @@ public class LC3VirtualMachine implements VirtualMachine {
     public void run() {
         setRegisterValue(LC3Register.R_PC, PC_START);
 
-        boolean running = true;
+        running = true;
         while(running) {
             short instruction = (short) memory.readInstruction(getAndIncProgramCounter());
             LC3OperationCode operationCode = LC3OperationCode.valueOf(instruction, INSTRUCTION_SIZE);
@@ -282,6 +284,7 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void halt() {
-
+        System.out.println("HALT");
+        running = false;
     }
 }
