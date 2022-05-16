@@ -243,7 +243,8 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void out() {
-
+        char registerValue = (char) getRegisterValue(LC3Register.R0);
+        System.out.println(registerValue);
     }
 
     public void puts() {
