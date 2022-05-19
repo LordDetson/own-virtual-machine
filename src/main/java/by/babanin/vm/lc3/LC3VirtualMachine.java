@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import by.babanin.vm.ConditionFlag;
 import by.babanin.vm.VirtualMachine;
+import by.babanin.vm.exception.VirtualMachineException;
 import by.babanin.vm.memory.VirtualMachineMemory;
 import by.babanin.vm.util.Utils;
 
@@ -98,17 +99,21 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void br(short instruction) {
-        byte n = (byte) ((instruction >>> 11) & 0x1);
-        byte z = (byte) ((instruction >>> 10) & 0x1);
-        byte p = (byte) ((instruction >>> 9) & 0x1);
-
+        boolean n = ((instruction >>> 11) & 0x1) == 1;
+        boolean z = ((instruction >>> 10) & 0x1) == 1;
+        boolean p = ((instruction >>> 9) & 0x1) == 1;
+        short pcOffset = signExtend((short) (instruction & 0x01FF), (byte) 9);
+        short programCounter = getProgramCounter();
         ConditionFlag conditionFlag = getConditionFlag();
-        if((n == 0 && z == 0 && p == 0) ||
-                (n == 1 && conditionFlag == LC3ConditionFlag.FL_NEG) ||
-                (z == 1 && conditionFlag == LC3ConditionFlag.FL_ZRO) ||
-                (p == 1 && conditionFlag == LC3ConditionFlag.FL_POS)) {
-            short pcOffset = signExtend((short) (instruction & 0x01FF), (byte) 9);
-            setProgramCounter((short) (getProgramCounter() + pcOffset));
+
+        if((!n && !z && !p) ||
+                (n && conditionFlag == LC3ConditionFlag.FL_NEG) ||
+                (z && conditionFlag == LC3ConditionFlag.FL_ZRO) ||
+                (p && conditionFlag == LC3ConditionFlag.FL_POS)) {
+            setProgramCounter((short) (programCounter + pcOffset));
+        }
+        else {
+            throw new VirtualMachineException("The BR operation didn't work. The conditions didn't pass.");
         }
     }
 
