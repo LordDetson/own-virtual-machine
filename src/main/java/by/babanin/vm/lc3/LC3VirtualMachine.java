@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import by.babanin.vm.ConditionFlag;
 import by.babanin.vm.VirtualMachine;
 import by.babanin.vm.memory.VirtualMachineMemory;
@@ -14,6 +17,8 @@ import by.babanin.vm.util.Utils;
  * Memory size is 131072 bytes or 128 KB.
  */
 public class LC3VirtualMachine implements VirtualMachine {
+
+    private static final Logger logger = LogManager.getLogger();
 
     private static final byte MEMORY_CELLS_DEGREE = 14;
     private static final byte MEMORY_CELLS_BASIS = 2;
