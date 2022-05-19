@@ -106,6 +106,9 @@ public class LC3VirtualMachine implements VirtualMachine {
         short programCounter = getProgramCounter();
         ConditionFlag conditionFlag = getConditionFlag();
 
+        logger.info("pc = {}; operation = {}; n = {}; z = {}; p = {}; pcOffset = {}",
+                Integer.toHexString(programCounter), LC3OperationCode.BR.name(), n, z, p, Integer.toHexString(pcOffset));
+
         if((!n && !z && !p) ||
                 (n && conditionFlag == LC3ConditionFlag.FL_NEG) ||
                 (z && conditionFlag == LC3ConditionFlag.FL_ZRO) ||
@@ -119,21 +122,26 @@ public class LC3VirtualMachine implements VirtualMachine {
 
     public void add(short instruction) {
         /* destination register (DR) */
-        LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
+        LC3Register dr = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
         /* first operand (SR1) */
         LC3Register r1 = LC3Register.valueOf((byte) ((instruction >>> 6) & 0x7));
         /* whether we are in immediate mode */
         short imm_flag = (short) ((instruction >>> 5) & 0x1);
+        short programCounter = getProgramCounter();
         if(imm_flag == 1) {
             short imm5 = signExtend((short) (instruction & 0x1F), (byte) 5);
-            setRegisterValue(r0, (short) (getRegisterValue(r1) + imm5));
+            setRegisterValue(dr, (short) (getRegisterValue(r1) + imm5));
+            logger.info("pc = {}; operation = {}; dr = {}; r1 = {}; imm5 = {}",
+                    Integer.toHexString(programCounter), LC3OperationCode.ADD.name(), dr, r1, Integer.toHexString(imm5));
         }
         else {
             LC3Register r2 = LC3Register.valueOf((byte) (instruction & 0x7));
-            setRegisterValue(r0, (short) (getRegisterValue(r1) + getRegisterValue(r2)));
+            setRegisterValue(dr, (short) (getRegisterValue(r1) + getRegisterValue(r2)));
+            logger.info("pc = {}; operation = {}; dr = {}; r1 = {}; r2 = {}",
+                    Integer.toHexString(programCounter), LC3OperationCode.ADD.name(), dr, r1, r2);
         }
 
-        updateFlag(r0);
+        updateFlag(dr);
     }
 
     public short signExtend(short value, byte size) {
@@ -144,56 +152,74 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void ld(short instruction) {
-        LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
+        LC3Register dr = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
         short pcOffset = signExtend((short) (instruction & 0x1FF), (byte) 9);
-        short value = (short) memory.readInstruction(getProgramCounter() + pcOffset);
-        setRegisterValue(r0, value);
-        updateFlag(r0);
+        short programCounter = getProgramCounter();
+        short value = (short) memory.readInstruction(programCounter + pcOffset);
+        setRegisterValue(dr, value);
+        updateFlag(dr);
+        logger.info("pc = {}; operation = {}; dr = {}; pcOffset = {}",
+                Integer.toHexString(programCounter), LC3OperationCode.LD.name(), dr, Integer.toHexString(pcOffset));
     }
 
     public void st(short instruction) {
-        LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
+        LC3Register r = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
         short pcOffset = signExtend((short) (instruction & 0x1FF), (byte) 9);
-        memory.writeInstruction(getProgramCounter() + pcOffset, getRegisterValue(r0));
+        short programCounter = getProgramCounter();
+        memory.writeInstruction(programCounter + pcOffset, getRegisterValue(r));
+        logger.info("pc = {}; operation = {}; r = {}; pcOffset = {}",
+                Integer.toHexString(programCounter), LC3OperationCode.ST.name(), r, Integer.toHexString(pcOffset));
     }
 
     public void jsr(short instruction) {
-        setRegisterValue(LC3Register.R7, getProgramCounter());
+        short programCounter = getProgramCounter();
+        setRegisterValue(LC3Register.R7, programCounter);
         byte immFlag = (byte) ((instruction >>> 11) & 0x1);
         if(immFlag == 0) {
             LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 6) & 0x7));
             setProgramCounter(getRegisterValue(r0));
+            logger.info("pc = {}; operation = {}; r0 = {}",
+                    Integer.toHexString(programCounter), LC3OperationCode.JSR.name(), r0);
         }
         else {
             short pcOffset = signExtend((short) (instruction & 0x7FF), (byte) 11);
-            setProgramCounter((short) (getProgramCounter() + pcOffset));
+            setProgramCounter((short) (programCounter + pcOffset));
+            logger.info("pc = {}; operation = {}; pcOffset = {}",
+                    Integer.toHexString(programCounter), LC3OperationCode.JSR.name(), Integer.toHexString(pcOffset));
         }
     }
 
     public void and(short instruction) {
-        LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
+        LC3Register dr = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
         LC3Register r1 = LC3Register.valueOf((byte) ((instruction >>> 6) & 0x7));
         byte immFlag = (byte) ((instruction >>> 5) & 0x1);
+        short programCounter = getProgramCounter();
         if(immFlag == 0) {
             LC3Register r2 = LC3Register.valueOf((byte) (instruction & 0x7));
-            setRegisterValue(r0, (short) (getRegisterValue(r1) & getRegisterValue(r2)));
+            setRegisterValue(dr, (short) (getRegisterValue(r1) & getRegisterValue(r2)));
+            logger.info("pc = {}; operation = {}; dr = {}; r1 = {}; r2 = {}",
+                    Integer.toHexString(programCounter), LC3OperationCode.AND.name(), dr, r1, r2);
         }
         else {
             short imm5 = signExtend((short) (instruction & 0x1F), (byte) 5);
-            setRegisterValue(r0, (short) (getRegisterValue(r1) & imm5));
+            setRegisterValue(dr, (short) (getRegisterValue(r1) & imm5));
+            logger.info("pc = {}; operation = {}; dr = {}; r1 = {}; imm5 = {}",
+                    Integer.toHexString(programCounter), LC3OperationCode.AND.name(), dr, r1, Integer.toHexString(imm5));
         }
 
-        updateFlag(r0);
+        updateFlag(dr);
     }
 
     public void ldr(short instruction) {
-        LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
+        LC3Register dr = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
         LC3Register r1 = LC3Register.valueOf((byte) ((instruction >>> 6) & 0x7));
         short pcOffset = signExtend((short) (instruction & 0x3F), (byte) 6);
         int address = getRegisterValue(r1) + pcOffset;
         short value = (short) memory.readInstruction(address);
-        setRegisterValue(r0, value);
-        updateFlag(r0);
+        setRegisterValue(dr, value);
+        updateFlag(dr);
+        logger.info("pc = {}; operation = {}; dr = {}; r1 = {}; pcOffset = {}",
+                Integer.toHexString(getProgramCounter()), LC3OperationCode.LDR.name(), dr, r1, Integer.toHexString(pcOffset));
     }
 
     public void str(short instruction) {
@@ -201,6 +227,8 @@ public class LC3VirtualMachine implements VirtualMachine {
         LC3Register r1 = LC3Register.valueOf((byte) ((instruction >>> 6) & 0x7));
         short pcOffset = signExtend((short) (instruction & 0x3F), (byte) 6);
         memory.writeInstruction(getRegisterValue(r1) + pcOffset, getRegisterValue(r0));
+        logger.info("pc = {}; operation = {}; r0 = {}; r1 = {}; pcOffset = {}",
+                Integer.toHexString(getProgramCounter()), LC3OperationCode.STR.name(), r0, r1, Integer.toHexString(pcOffset));
     }
 
     public void rti(short instruction) {
@@ -208,28 +236,40 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void not(short instruction) {
-        LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
+        LC3Register dr = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
         LC3Register r1 = LC3Register.valueOf((byte) ((instruction >>> 6) & 0x7));
-        setRegisterValue(r0, (short) ~getRegisterValue(r1));
-        updateFlag(r0);
+        setRegisterValue(dr, (short) ~getRegisterValue(r1));
+        updateFlag(dr);
+        logger.info("pc = {}; operation = {}; dr = {}; r1 = {}",
+                Integer.toHexString(getProgramCounter()), LC3OperationCode.NOT.name(), dr, r1);
     }
 
     public void ldi(short instruction) {
-        LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
+        LC3Register dr = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
         short pcOffset = signExtend((short) (instruction & 0x01FF), (byte) 9);
-        setRegisterValue(r0, (short) memory.readInstruction(memory.readInstruction(getProgramCounter() + pcOffset)));
-        updateFlag(r0);
+        short programCounter = getProgramCounter();
+        setRegisterValue(dr, (short) memory.readInstruction(memory.readInstruction(programCounter + pcOffset)));
+        updateFlag(dr);
+        logger.info("pc = {}; operation = {}; dr = {}; pcOffset = {}",
+                Integer.toHexString(programCounter), LC3OperationCode.LDI.name(), dr, Integer.toHexString(pcOffset));
     }
 
     public void sti(short instruction) {
         LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
         short pcOffset = signExtend((short) (instruction & 0x1FF), (byte) 9);
-        memory.writeInstruction(memory.readInstruction(getProgramCounter() + pcOffset), getRegisterValue(r0));
+        short programCounter = getProgramCounter();
+        memory.writeInstruction(memory.readInstruction(programCounter + pcOffset), getRegisterValue(r0));
+        logger.info("pc = {}; operation = {}; r0 = {}; pcOffset = {}",
+                Integer.toHexString(programCounter), LC3OperationCode.STI.name(), r0, Integer.toHexString(pcOffset));
+
     }
 
     public void jmp(short instruction) {
         LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 6) & 0x7));
+        short programCounter = getProgramCounter();
         setProgramCounter(getRegisterValue(r0));
+        logger.info("pc = {}; operation = {}; r0 = {}",
+                Integer.toHexString(programCounter), LC3OperationCode.JMP.name(), r0);
     }
 
     public void res(short instruction) {
@@ -237,15 +277,21 @@ public class LC3VirtualMachine implements VirtualMachine {
     }
 
     public void lea(short instruction) {
-        LC3Register r0 = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
+        LC3Register dr = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
         short pcOffset = signExtend((short) (instruction & 0x01FF), (byte) 9);
-        setRegisterValue(r0, (short) (getProgramCounter() + pcOffset));
-        updateFlag(r0);
+        short programCounter = getProgramCounter();
+        setRegisterValue(dr, (short) (programCounter + pcOffset));
+        updateFlag(dr);
+        logger.info("pc = {}; operation = {}; dr = {}; pcOffset = {}",
+                Integer.toHexString(programCounter), LC3OperationCode.LEA.name(), dr, Integer.toHexString(pcOffset));
     }
 
     public void trap(short instruction) {
         LC3TrapCode trapCode = LC3TrapCode.valueOf((byte) (instruction & 0xFF));
+        short programCounter = getProgramCounter();
         trapCode.execute(this);
+        logger.info("pc = {}; operation = {}; trap = {}",
+                Integer.toHexString(programCounter), LC3OperationCode.TRAP.name(), trapCode.name());
     }
 
     public void getc() {
