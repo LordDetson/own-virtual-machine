@@ -305,7 +305,7 @@ public class LC3VirtualMachine implements VirtualMachine {
             builder.append(character);
         }
         while(character != 0);
-        System.out.println(builder);
+        System.out.print(builder);
     }
 
     public void in() {
@@ -325,7 +325,7 @@ public class LC3VirtualMachine implements VirtualMachine {
             builder.append((char) (twoCharacters & 0xFF));
         }
         while(twoCharacters != 0);
-        System.out.println(builder);
+        System.out.print(builder);
     }
 
     public void halt() {
