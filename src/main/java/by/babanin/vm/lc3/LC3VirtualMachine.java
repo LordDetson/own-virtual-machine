@@ -288,7 +288,8 @@ public class LC3VirtualMachine implements VirtualMachine {
     public void getc() {
         Scanner scanner = new Scanner(System.in);
         String str = scanner.nextLine();
-        setRegisterValue(LC3Register.R0, (short) str.charAt(0));
+        short value = (short) (str.isEmpty() ? 0 : str.charAt(0));
+        setRegisterValue(LC3Register.R0, value);
     }
 
     public void out() {
