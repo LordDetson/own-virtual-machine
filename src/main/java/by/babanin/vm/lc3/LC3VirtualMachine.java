@@ -239,7 +239,7 @@ public class LC3VirtualMachine implements VirtualMachine {
         LC3Register dr = LC3Register.valueOf((byte) ((instruction >>> 9) & 0x7));
         short pcOffset = signExtend((short) (instruction & 0x01FF), (byte) 9);
         short programCounter = getProgramCounter();
-        setRegisterValue(dr, (short) memory.readInstruction(memory.readInstruction(programCounter + pcOffset)));
+        setRegisterValue(dr, (short) memory.readInstruction(memory.readInstruction(programCounter + pcOffset) & 0xFFFF));
         updateFlag(dr);
         logger.info("pc = {}; operation = {}; dr = {}; pcOffset = {}",
                 Integer.toHexString(programCounter), LC3OperationCode.LDI.name(), dr, Integer.toHexString(pcOffset));
