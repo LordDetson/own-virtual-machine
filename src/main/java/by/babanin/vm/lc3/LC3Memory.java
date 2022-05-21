@@ -1,5 +1,7 @@
 package by.babanin.vm.lc3;
 
+import java.util.Scanner;
+
 import by.babanin.vm.VirtualMachineMemory;
 import by.babanin.vm.exception.VirtualMachineException;
 
@@ -21,7 +23,23 @@ public class LC3Memory implements VirtualMachineMemory {
     @Override
     public long readInstruction(long address) {
         validateAddress(address);
+        int kbsrAddress = (int) (LC3MemoryRegister.KBSR.getAddress() & 0xFFFF);
+        int kbdrAddress = (int) (LC3MemoryRegister.KBDR.getAddress() & 0xFFFF);
+        if(kbsrAddress == address) {
+            short character = readKey();
+            memory[kbsrAddress] = (short) (1 << 15);
+            memory[kbdrAddress] = character;
+        }
         return memory[(int) address];
+    }
+
+    private short readKey() {
+        Scanner scanner = new Scanner(System.in);
+        String str = scanner.nextLine();
+        if(str.isEmpty()) {
+            return 0;
+        }
+        return (short) str.charAt(0);
     }
 
     private void validateAddress(long address) {
