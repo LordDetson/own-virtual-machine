@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import by.babanin.vm.exception.VirtualMachineException;
 import by.babanin.vm.factory.VirtualMachineFactory;
 import by.babanin.vm.lc3.LC3ConditionFlag;
 import by.babanin.vm.lc3.LC3Register;
@@ -187,7 +186,10 @@ class LC3VirtualMachineTest {
         short instruction = (short) 0b0000_100_000111111;
         virtualMachine.setConditionFlag(LC3ConditionFlag.FL_ZRO);
 
-        Assertions.assertThrows(VirtualMachineException.class, () -> virtualMachine.br(instruction));
+        virtualMachine.br(instruction);
+
+        short programCounter = virtualMachine.getProgramCounter();
+        Assertions.assertEquals(0x00, programCounter);
     }
 
     @Test

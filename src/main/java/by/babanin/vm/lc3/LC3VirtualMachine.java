@@ -10,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 import by.babanin.vm.ConditionFlag;
 import by.babanin.vm.VirtualMachine;
 import by.babanin.vm.VirtualMachineMemory;
-import by.babanin.vm.exception.VirtualMachineException;
 import by.babanin.vm.util.Utils;
 
 public class LC3VirtualMachine implements VirtualMachine {
@@ -105,9 +104,6 @@ public class LC3VirtualMachine implements VirtualMachine {
                 (z && conditionFlag == LC3ConditionFlag.FL_ZRO) ||
                 (p && conditionFlag == LC3ConditionFlag.FL_POS)) {
             setProgramCounter((short) (programCounter + pcOffset));
-        }
-        else {
-            throw new VirtualMachineException("The BR operation didn't work. The conditions didn't pass.");
         }
     }
 
