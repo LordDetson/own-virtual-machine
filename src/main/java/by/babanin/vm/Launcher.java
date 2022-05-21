@@ -5,20 +5,30 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import by.babanin.vm.factory.VirtualMachineFactory;
 
 public class Launcher {
 
-    public static void main(String[] args) {
-        Path path = Paths.get(args[0]);
-        byte[] programBytes = readFile(path);
-        short origin = getOrigin(programBytes);
-        String program = getProgram(programBytes);
+    private static final Logger logger = LogManager.getLogger();
 
-        VirtualMachineFactory virtualMachineFactory = new VirtualMachineFactory();
-        VirtualMachine virtualMachine = virtualMachineFactory.lc3VirtualMachine();
-        virtualMachine.writeProgram(origin, program);
-        virtualMachine.run();
+    public static void main(String[] args) {
+        try {
+            Path path = Paths.get(args[0]);
+            byte[] programBytes = readFile(path);
+            short origin = getOrigin(programBytes);
+            String program = getProgram(programBytes);
+
+            VirtualMachineFactory virtualMachineFactory = new VirtualMachineFactory();
+            VirtualMachine virtualMachine = virtualMachineFactory.lc3VirtualMachine();
+            virtualMachine.writeProgram(origin, program);
+            virtualMachine.run();
+        }
+        catch(Throwable throwable) {
+            logger.error("", throwable);
+        }
     }
 
     private static byte[] readFile(Path path) {
