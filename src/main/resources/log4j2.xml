@@ -1,4 +1,4 @@
-<Configuration status="debug" name="own-virtual-machine" packages="by.babanin.vm">
+<Configuration status="info" name="own-virtual-machine" packages="by.babanin.vm">
     <Appenders>
         <File name="fout" fileName="own-virtual-machine.log" append="false">
             <PatternLayout>
