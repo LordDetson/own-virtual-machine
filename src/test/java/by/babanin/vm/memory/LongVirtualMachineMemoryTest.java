@@ -7,15 +7,15 @@ import org.junit.jupiter.api.Test;
 
 import by.babanin.vm.exception.VirtualMachineException;
 
-class VirtualMachineMemoryTest {
+class LongVirtualMachineMemoryTest {
 
     private static final int CELLS_AMOUNT = (int) Math.pow(2, 14);
     private static final byte INSTRUCTION_SIZE = 16;
-    private VirtualMachineMemory memory;
+    private LongVirtualMachineMemory memory;
 
     @BeforeEach
     void setUp() {
-        memory = new VirtualMachineMemory(CELLS_AMOUNT, (byte) 16);
+        memory = new LongVirtualMachineMemory(CELLS_AMOUNT, (byte) 16);
     }
 
     @AfterEach
@@ -25,10 +25,10 @@ class VirtualMachineMemoryTest {
 
     @Test
     void testConstructor() {
-        Assertions.assertThrows(VirtualMachineException.class, () -> new VirtualMachineMemory(0, INSTRUCTION_SIZE));
-        Assertions.assertThrows(VirtualMachineException.class, () -> new VirtualMachineMemory(-10, INSTRUCTION_SIZE));
-        Assertions.assertThrows(VirtualMachineException.class, () -> new VirtualMachineMemory(CELLS_AMOUNT, (byte) 0));
-        Assertions.assertThrows(VirtualMachineException.class, () -> new VirtualMachineMemory(CELLS_AMOUNT, (byte) 65));
+        Assertions.assertThrows(VirtualMachineException.class, () -> new LongVirtualMachineMemory(0, INSTRUCTION_SIZE));
+        Assertions.assertThrows(VirtualMachineException.class, () -> new LongVirtualMachineMemory(-10, INSTRUCTION_SIZE));
+        Assertions.assertThrows(VirtualMachineException.class, () -> new LongVirtualMachineMemory(CELLS_AMOUNT, (byte) 0));
+        Assertions.assertThrows(VirtualMachineException.class, () -> new LongVirtualMachineMemory(CELLS_AMOUNT, (byte) 65));
     }
 
     @Test
@@ -79,7 +79,7 @@ class VirtualMachineMemoryTest {
 
     @Test
     void testOutOfRange() {
-        long maxAddress = CELLS_AMOUNT * VirtualMachineMemory.CELL_SIZE - INSTRUCTION_SIZE;
+        long maxAddress = CELLS_AMOUNT * LongVirtualMachineMemory.CELL_SIZE - INSTRUCTION_SIZE;
         long instruction = 0b1001_1100_0100_1011;
         Assertions.assertThrows(VirtualMachineException.class, () -> memory.writeInstruction(maxAddress + 1, instruction));
         Assertions.assertThrows(VirtualMachineException.class, () -> memory.readInstruction(maxAddress + 1));

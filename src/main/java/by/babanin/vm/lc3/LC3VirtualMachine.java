@@ -9,20 +9,13 @@ import org.apache.logging.log4j.Logger;
 
 import by.babanin.vm.ConditionFlag;
 import by.babanin.vm.VirtualMachine;
+import by.babanin.vm.VirtualMachineMemory;
 import by.babanin.vm.exception.VirtualMachineException;
-import by.babanin.vm.memory.VirtualMachineMemory;
 import by.babanin.vm.util.Utils;
 
-/**
- * Memory has 16384 cells. Each cell is 8 bytes or 64 bits.
- * Memory size is 131072 bytes or 128 KB.
- */
 public class LC3VirtualMachine implements VirtualMachine {
 
     private static final Logger logger = LogManager.getLogger();
-
-    private static final byte MEMORY_CELLS_DEGREE = 14;
-    private static final byte MEMORY_CELLS_BASIS = 2;
     private static final byte INSTRUCTION_SIZE = 16;
     private static final short PC_START = 0x3000;
     private final Map<LC3Register, Short> registers = new HashMap<>(LC3Register.values().length);
@@ -31,9 +24,7 @@ public class LC3VirtualMachine implements VirtualMachine {
     private boolean running;
 
     public LC3VirtualMachine() {
-        int cellsAmount = (int) Math.pow(MEMORY_CELLS_BASIS, MEMORY_CELLS_DEGREE);
-        this.memory = new VirtualMachineMemory(cellsAmount, INSTRUCTION_SIZE);
-
+        this.memory = new LC3Memory();
     }
 
     @Override
@@ -53,7 +44,7 @@ public class LC3VirtualMachine implements VirtualMachine {
         for(int i = 0; i < program.length(); i += INSTRUCTION_SIZE) {
             long instruction = Utils.parseLong(program.substring(i, i + INSTRUCTION_SIZE), 2);
             memory.writeInstruction(address, instruction);
-            address += INSTRUCTION_SIZE;
+            address ++;
         }
     }
 
@@ -94,7 +85,7 @@ public class LC3VirtualMachine implements VirtualMachine {
 
     public short getAndIncProgramCounter() {
         short pc = getProgramCounter();
-        setProgramCounter((short) (pc + INSTRUCTION_SIZE));
+        setProgramCounter((short) (pc + 1));
         return pc;
     }
 
@@ -310,9 +301,8 @@ public class LC3VirtualMachine implements VirtualMachine {
         char character;
         StringBuilder builder = new StringBuilder();
         do {
-            character = (char) memory.readInstruction(charAddress);
+            character = (char) memory.readInstruction(charAddress++);
             builder.append(character);
-            charAddress += 16;
         }
         while(character != 0);
         System.out.println(builder);
@@ -330,10 +320,9 @@ public class LC3VirtualMachine implements VirtualMachine {
         char twoCharacters;
         StringBuilder builder = new StringBuilder();
         do {
-            twoCharacters = (char) memory.readInstruction(charAddress);
+            twoCharacters = (char) memory.readInstruction(charAddress++);
             builder.append((char) ((twoCharacters >> 8) & 0xFF));
             builder.append((char) (twoCharacters & 0xFF));
-            charAddress += 16;
         }
         while(twoCharacters != 0);
         System.out.println(builder);

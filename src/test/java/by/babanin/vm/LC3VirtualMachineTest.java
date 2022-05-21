@@ -97,11 +97,11 @@ class LC3VirtualMachineTest {
     @Test
     void testLdi1() {
         long address = 0x3000;
-        short instruction = (short) 0b1010_001_000010000;
+        short instruction = (short) 0b1010_001_000000001;
         String program =
-                "1010001000010000" +
+                "1010001000000001" +
                 "0000000000000000" + // PC position
-                "0011000001000000" +
+                "0011000000000100" +
                 "0000000000000000" +
                 "0000000001111111";
         virtualMachine.writeProgram(address, program);
@@ -117,7 +117,7 @@ class LC3VirtualMachineTest {
     @Test
     void testLdi2() {
         long address = 0x3000;
-        short instruction = (short) 0b1010_001_000010000;
+        short instruction = (short) 0b1010_001_000000001;
         String program =
                 "0000000001111111" +
                 "1010001000010000" +

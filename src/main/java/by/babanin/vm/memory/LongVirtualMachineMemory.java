@@ -1,12 +1,13 @@
 package by.babanin.vm.memory;
 
+import by.babanin.vm.VirtualMachineMemory;
 import by.babanin.vm.exception.VirtualMachineException;
 import by.babanin.vm.util.MaskGenerator;
 
 /**
  * The maximum you can allocate is 16 gigabytes or 17,179,869,184 bytes
  */
-public class VirtualMachineMemory {
+public class LongVirtualMachineMemory implements VirtualMachineMemory {
 
     public static final byte CELL_SIZE = 64;
 
@@ -14,7 +15,7 @@ public class VirtualMachineMemory {
     private final byte instructionSize;
     private final long maxAddress;
 
-    public VirtualMachineMemory(final int cellsAmount, final byte instructionSize) {
+    public LongVirtualMachineMemory(final int cellsAmount, final byte instructionSize) {
         if(cellsAmount <= 0) {
             throw new VirtualMachineException("Amount of memory cells cannot be less than or equal to 0");
         }
